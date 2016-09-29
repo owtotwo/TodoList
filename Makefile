@@ -11,6 +11,9 @@ $(OBJ_DIR)/todolist_model.o: $(SRC_DIR)/todolist_model.c  $(INC_DIR)/todolist_mo
 		$(INC_DIR)/todolist_error_code.h
 	$(CC) $(CC_FLAG) -c $< -o $@
 
-
+$(OBJ_DIR)/todolist_storage.o: $(SRC_DIR)/todolist_storage.c $(INC_DIR)/todolist_storage.h  \
+		$(INC_DIR)/todolist_error_code.h
+	$(CC) $(CC_FLAG) -c $< -o $@
+	
 clean:
 	rm -rf $(OBJ_DIR)/*.o main
