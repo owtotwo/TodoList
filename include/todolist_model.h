@@ -15,7 +15,7 @@ typedef enum {
 } item_state_t;
 
 typedef struct {
-    id_t item->contentid;
+    id_t id;
     char* content;
     item_state_t state;
     time_t timestamp;
