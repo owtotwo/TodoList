@@ -30,7 +30,7 @@ void destroy_item(item_t** item) {
 
 item_t* copy_item(const item_t* item) {
     item_t* new_item = (item_t*)malloc(sizeof(item_t));
-    assert(!item || !new_item); // copy failed
+    assert(item && new_item); // copy failed
     
     new_item->content = (char*)malloc((strlen(item->content) + 1) * sizeof(char));
     strcpy(new_item->content, item->content);
@@ -89,11 +89,21 @@ error_t item_list_add(item_list_t* item_list, const item_t* item) {
     item_node_t* new_node = (item_node_t*)malloc(sizeof(item_node_t));
     assert(new_node);
 
+    new_node->data = new_item;
+
+    assert(!((item_list->head == NULL) ^ (item_list->tail == NULL)));
     item_node_t* p = item_list->head;
-    p->prev = new_node;
-    new_node->next = p;
-    new_node->prev = NULL;
-    item_list->head = new_node;
+    if (p) {
+        item_node_t* tmp = p->prev;
+        p->prev = new_node;
+        new_node->next = p;
+        new_node->prev = tmp;
+        item_list->head = new_node;
+    } else {
+        new_node->next = NULL;
+        new_node->prev = NULL;
+        item_list->head = item_list->tail = new_node;
+    }
     
     return SUCCESS;
 }
@@ -136,7 +146,7 @@ error_t todolist_add_item(todolist_t* tdl, const char* content, id_t id,
     if (!item || !tdl) return FAILURE;
 
     error_t result = item_list_add(tdl->item_list, item);
-    if (result) tdl->id_count++;
+    if (result == SUCCESS) tdl->id_count++;
 
     return result;
 }
