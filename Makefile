@@ -29,4 +29,4 @@ $(OBJ_DIR)/cJSON.o:
 	cd $(LIB_DIR) && make CC=$(CC)
 
 clean:
-	rm -rf $(OBJ_DIR)/*.o main
+	rm -rf $(OBJ_DIR)/*.o main *.out
