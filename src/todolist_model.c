@@ -4,6 +4,9 @@
 
 #include "todolist_model.h"
 
+
+static item_t* todolist_get_item_reference(const todolist_t* tdl, id_t id);
+
 /* Methods for Class Item */
 item_t* create_item(const char* content, id_t id,
                  item_state_t state, time_t timestamp) {
@@ -32,7 +35,7 @@ item_t* create_empty_item() {
 }
 
 void destroy_item(item_t** item) {
-    if (!item) return;
+    if (!item || !*item) return;
 
     free((*item)->content);
     (*item)->content = NULL;
@@ -69,7 +72,7 @@ item_list_t* create_item_list() {
 }
 
 void destroy_item_list(item_list_t** item_list) {
-    if (!item_list) return;
+    if (!item_list && !*item_list) return;
 
     item_node_t* p = (*item_list)->head;
     while (p) {
@@ -137,7 +140,7 @@ todolist_t* create_todolist() {
 }
 
 void destroy_todolist(todolist_t** tdl) {
-    if (!tdl) return;
+    if (!tdl || !*tdl) return;
 
     destroy_item_list(&((*tdl)->item_list));
 
@@ -166,21 +169,10 @@ error_t todolist_add_item(todolist_t* tdl, const char* content, id_t id,
     return result;
 }
 
-static item_t* todolist_get_item(const todolist_t* tdl, id_t id) {
-    if (!tdl) return NULL;
-    item_node_t* p = tdl->item_list->head;
-    while (p) {
-        if (p->data->id == id)
-            return p->data;
-        p = p->next;
-    }
-    return NULL;
-}
-
 error_t todolist_finish_item(todolist_t* tdl, id_t id, time_t timestamp) {
     if (!tdl) return FAILURE;
 
-    item_t* item = todolist_get_item(tdl, id);
+    item_t* item = todolist_get_item_reference(tdl, id);
     assert(item);
     item->state = FINISHED;
     item->timestamp = timestamp;
@@ -188,14 +180,25 @@ error_t todolist_finish_item(todolist_t* tdl, id_t id, time_t timestamp) {
     return SUCCESS;
 }
 
-error_t todolist_find_item(const todolist_t* tdl, item_list_t** return_list,
-                           filter_t filter, ...) {
+error_t todolist_find_items(const todolist_t* tdl, item_list_t** return_list,
+                              filter_t filter, ...) {
     if (!tdl) return FAILURE;
+    assert(return_list && *return_list && tdl->item_list);
 
     va_list ap;
     va_start(ap, filter);
 
+    error_t result = todolist_vfind_items(tdl, return_list, filter, ap);
+
+    va_end(ap);
+    return result;
+}
+
+error_t todolist_vfind_items(const todolist_t* tdl, item_list_t** return_list,
+                           filter_t filter, va_list ap) {
+    if (!tdl) return FAILURE;
     assert(return_list && *return_list && tdl->item_list);
+
     item_node_t* p = tdl->item_list->head;
     while (p) {
         va_list vl;
@@ -206,10 +209,20 @@ error_t todolist_find_item(const todolist_t* tdl, item_list_t** return_list,
         p = p->next;
     }
 
-    va_end(ap);
     return SUCCESS;
 }
 
 id_t todolist_get_a_new_id(todolist_t* tdl) {
     return ++(tdl->id_count);
+}
+
+static item_t* todolist_get_item_reference(const todolist_t* tdl, id_t id) {
+    if (!tdl) return NULL;
+    item_node_t* p = tdl->item_list->head;
+    while (p) {
+        if (p->data->id == id)
+            return p->data;
+        p = p->next;
+    }
+    return NULL;
 }

@@ -66,8 +66,10 @@ todolist_t* copy_todolist(const todolist_t* tdl);
 error_t todolist_add_item(todolist_t* tdl, const char* content, id_t id,
                           item_state_t state, time_t timestamp);
 error_t todolist_finish_item(todolist_t* tdl, id_t id, time_t timestamp);
-error_t todolist_find_item(const todolist_t* tdl, item_list_t** return_list,
-                           filter_t filter, ...);
+error_t todolist_find_items(const todolist_t* tdl, item_list_t** return_list,
+                            filter_t filter, ...);
+error_t todolist_vfind_items(const todolist_t* tdl, item_list_t** return_list,
+                             filter_t filter, va_list);
 
 id_t todolist_get_a_new_id(todolist_t* tdl);
 
