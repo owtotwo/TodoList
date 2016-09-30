@@ -67,7 +67,7 @@ error_t todolist_load(todolist_t* tdl) {
     assert(cJSON_HasObjectItem(root, "data"));
     cJSON* data = cJSON_GetObjectItem(root, "data");
     
-    for (int i = 0; i < cJSON_GetArraySize(data); i++) {
+    for (int i = cJSON_GetArraySize(data) - 1; i >= 0; i--) {
         cJSON* item = cJSON_GetArrayItem(data, i);
         todolist_add_item(
             tmp,

@@ -108,13 +108,13 @@ error_t item_list_add(item_list_t* item_list, const item_t* item) {
     new_node->data = new_item;
 
     assert(!((item_list->head == NULL) ^ (item_list->tail == NULL)));
-    item_node_t* p = item_list->head;
+    item_node_t* p = item_list->tail;
     if (p) {
-        item_node_t* tmp = p->prev;
-        p->prev = new_node;
-        new_node->next = p;
-        new_node->prev = tmp;
-        item_list->head = new_node;
+        item_node_t* tmp = p->next;
+        p->next = new_node;
+        new_node->prev = p;
+        new_node->next = tmp;
+        item_list->tail = new_node;
     } else {
         new_node->next = NULL;
         new_node->prev = NULL;

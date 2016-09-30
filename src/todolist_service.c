@@ -38,13 +38,16 @@ error_t service_find_item_by_keyword(const todolist_t* tdl, const char* item_key
 int service_get_n_items_by_state(const todolist_t* tdl, item_list_t** item_list,
                                      int line_count, int done_needed) {
     item_state_t state = done_needed ? FINISHED : UNFINISHED;
-    todolist_find_item(tdl, item_list, filter_by_state, state);
 
-    const item_node_t* p = (*item_list)->head;
+    item_list_t* tmp = create_item_list();
+    todolist_find_item(tdl, &tmp, filter_by_state, state);
+
+    const item_node_t* p = tmp->head;
     int count = 0;
-    for (; count < line_count && p; count++, p = item_node_next(p))
+    for (; count < line_count && p ; count++, p = item_node_next(p))
         item_list_add((*item_list), p->data);
     
+    destroy_item_list(&tmp);
     return count;
 }
 
