@@ -23,6 +23,7 @@ typedef struct {
 
 item_t* create_item(const char* content, id_t id,
                  item_state_t state, time_t timestamp);
+item_t* create_empty_item();
 void destroy_item(item_t** item);
 item_t* copy_item(const item_t* item);
 
@@ -35,6 +36,8 @@ struct item_node {
 };
 
 typedef struct item_node item_node_t;
+
+const item_node_t* item_node_next(const item_node_t* item_node);
 
 typedef struct {
     item_node_t* head;
@@ -65,5 +68,7 @@ error_t todolist_add_item(todolist_t* tdl, const char* content, id_t id,
 error_t todolist_finish_item(todolist_t* tdl, id_t id, time_t timestamp);
 error_t todolist_find_item(const todolist_t* tdl, item_list_t** return_list,
                            filter_t filter, ...);
+
+id_t todolist_get_a_new_id(todolist_t* tdl);
 
 #endif // TODOLIST_TODOLIST_MODEL_H__

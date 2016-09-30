@@ -52,10 +52,10 @@ error_t todolist_load(todolist_t* tdl) {
     fread(buffer, sizeof(char), length, fin);
     buffer[length] = '\0';
 
-    // parse as json
-    cJSON* json = cJSON_Parse(buffer);
+    // parse as root
+    cJSON* root = cJSON_Parse(buffer);
 
-    if (!json) {
+    if (!root) {
         perror("Invalid Json");
         return FAILURE;
     }
@@ -64,8 +64,8 @@ error_t todolist_load(todolist_t* tdl) {
     todolist_t* tmp = create_todolist();
     assert(tmp);
     
-    assert(cJSON_HasObjectItem(json, "data"));
-    cJSON* data = cJSON_GetObjectItem(json, "data");
+    assert(cJSON_HasObjectItem(root, "data"));
+    cJSON* data = cJSON_GetObjectItem(root, "data");
     
     for (int i = 0; i < cJSON_GetArraySize(data); i++) {
         cJSON* item = cJSON_GetArrayItem(data, i);
@@ -77,7 +77,10 @@ error_t todolist_load(todolist_t* tdl) {
             cJSON_GetObjectItem(item, "timestamp")->valueint
         );
     }
-    
+
+    tmp->id_count = cJSON_GetObjectItem(root, "id_count")->valueint;
+    cJSON_Delete(root);
+
     destroy_todolist(&tdl);
     tdl = copy_todolist(tmp);
 

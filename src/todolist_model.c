@@ -19,6 +19,18 @@ item_t* create_item(const char* content, id_t id,
     return new_item;
 }
 
+item_t* create_empty_item() {
+    item_t* new_item = (item_t*)malloc(sizeof(item_t));
+    assert(new_item); // create failed
+
+    new_item->content = NULL;
+    new_item->id = 0;
+    new_item->state = UNKNOWN_ITEM_STATE;
+    new_item->timestamp = 0;
+    
+    return new_item;
+}
+
 void destroy_item(item_t** item) {
     if (!item) return;
 
@@ -39,6 +51,10 @@ item_t* copy_item(const item_t* item) {
     new_item->timestamp = item->timestamp;
 
     return new_item;
+}
+
+const item_node_t* item_node_next(const item_node_t* item_node) {
+    return item_node->next;
 }
 
 /* Methods for Class Item List */
@@ -146,7 +162,6 @@ error_t todolist_add_item(todolist_t* tdl, const char* content, id_t id,
     if (!item || !tdl) return FAILURE;
 
     error_t result = item_list_add(tdl->item_list, item);
-    if (result == SUCCESS) tdl->id_count++;
 
     return result;
 }
@@ -166,6 +181,7 @@ error_t todolist_finish_item(todolist_t* tdl, id_t id, time_t timestamp) {
     if (!tdl) return FAILURE;
 
     item_t* item = todolist_get_item(tdl, id);
+    assert(item);
     item->state = FINISHED;
     item->timestamp = timestamp;
 
@@ -179,19 +195,21 @@ error_t todolist_find_item(const todolist_t* tdl, item_list_t** return_list,
     va_list ap;
     va_start(ap, filter);
 
-    item_list_t* re_list = create_item_list();
-    assert(re_list && tdl->item_list);
+    assert(return_list && *return_list && tdl->item_list);
     item_node_t* p = tdl->item_list->head;
     while (p) {
         va_list vl;
         va_copy(vl, ap);
         if (filter(p->data, vl))
-            item_list_add(re_list, p->data);
+            item_list_add(*return_list, p->data);
         va_end(vl);
         p = p->next;
     }
 
     va_end(ap);
-    *return_list = re_list;
     return SUCCESS;
+}
+
+id_t todolist_get_a_new_id(todolist_t* tdl) {
+    return ++(tdl->id_count);
 }
