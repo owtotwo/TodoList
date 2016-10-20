@@ -13,7 +13,7 @@ static int filter_by_state(const item_t* item, va_list ap);
 error_t service_add_item(todolist_t* tdl, const char* content) {
     if (!tdl) return FAILURE;
     return todolist_add_item(tdl, content, todolist_get_a_new_id(tdl), UNFINISHED,
-                      time(NULL));
+                             time(NULL));
 }
 
 error_t service_finish_item(todolist_t* tdl, id_t item_id) {
@@ -46,12 +46,12 @@ error_t service_find_items_by_keyword(const todolist_t* tdl, const char* keyword
 }
 
 error_t service_find_item_by_id(const todolist_t* tdl, id_t item_id,
-                                 item_t** item){
+                                item_t** item) {
     return service_find_item(tdl, item, filter_by_id, item_id);
 }
 
 int service_find_items_by_state(const todolist_t* tdl, item_list_t** item_list,
-                                     int line_count, int is_done) {
+                                int line_count, int is_done) {
     item_state_t state = is_done ? FINISHED : UNFINISHED;
 
     item_list_t* tmp = create_item_list();

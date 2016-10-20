@@ -84,5 +84,7 @@ error_t todolist_load(todolist_t* tdl) {
     destroy_todolist(&tdl);
     tdl = copy_todolist(tmp);
 
+    fclose(fin);
+
     return SUCCESS;
 }
