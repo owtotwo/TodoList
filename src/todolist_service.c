@@ -32,6 +32,7 @@ static error_t service_find_item(const todolist_t* tdl, item_t** return_item,
     if (todolist_vfind_items(tdl, &return_list, filter, ap) == FAILURE)
         return FAILURE;
     assert(return_list->head && return_list->head == return_list->tail);
+    destroy_item(return_item);
     *return_item = copy_item(return_list->head->data);
 
     destroy_item_list(&return_list);
